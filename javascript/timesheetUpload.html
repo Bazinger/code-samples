@@ -1,0 +1,139 @@
+<div>
+    <div data-part="label" class="options-header group" data-bind="css: {error:hasErrors, complete:hasSuccess, warning: hasWarnings}" ><!---->
+        <!-- TODO: swap data bind value above to importStatus when completed -->
+        <h2>File(s) to import</h2>
+    </div>
+    <div class="option-container group">
+        <div class="placeholder-wrapper upload" data-bind="visible: timesheets">
+            <span>Choose a file to upload</span>
+        </div>        
+        <div class="option-result-wrapper">
+            
+            <ul data-bind="foreach: timesheets">
+                <li>
+                    <div class="filename-wrapper group">
+                        <div class="block-group">
+                            <!-- Apply CSS classes to span below for state on import: complete, warning, error (respective to state) -->
+                            <span data-bind="text: filename,css: {error:(importErrors>0), warning: (importWarnings>0),complete: importSuccess}"></span>
+                            <img data-bind="visible: importInProgress" src="/assets/img/ajax-progressbar.gif" />
+                            
+                            <!-- trashcan icon -->
+                            <span class="pull-right" data-bind="visible:!importComplete,click:$parent.confirmRemove"><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAARCAYAAADUryzEAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAL9JREFUeNpi3LZtGwMWIAjExmhie7ApZMEi5gLEq6CGIIOzQGxCjAFpUM2zgPgekqEuULlZ6Aa4oDk3FErfQxJ7j2Y4DMxigWruwOISbGLGaJbtYQISnUDsChWoAGJGAhgWoCD2WRYctghCA80Y6nwQVoKKoQAmHE7fDdW8G8oPRRIjaABJYNQA7Ek5HRple6DpAxaNZ7FFI7oBStAkfA9LDryHzwtnobaA0vp/AhjFMBakzOIKzVjEAHiOBAgwAENjL0PM6yqvAAAAAElFTkSuQmCC" /></span>
+                        </div>
+                    </div>
+                    <!-- Apply CSS TWO classes: animated fadeOutUp to option-wrapper on import  -->
+                    <div class="option-wrapper group" data-bind="css: {animated: ($parent.importComplete && !importWarnings  && !importErrors),fadeOutUp:($parent.importComplete && !importWarnings && !importErrors )}">
+                        <label class="label-header">Apply shift premiums for the employee's default shift?</label>
+                        <div class="form-group-indent">
+                            <div class="squared-radio">
+                                <input data-bind="attr: { 'id':'shiftPayYes' + $index(),'name': 'shiftPay' + $index() },checked: importTimeRequest.ShiftPay,checkedValue:true" type="radio" />
+                                <label data-bind="attr: {'for': 'shiftPayYes' + $index() }" ><span><strong>Yes</strong></span></label>
+                            </div>
+                            <div class="squared-radio">
+                                <input  data-bind="attr: {'id':'shiftPayNo' + $index(),'name': 'shiftPay' + $index()},checked: importTimeRequest.ShiftPay,checkedValue:false" type="radio" />
+                                <label data-bind="attr: {'for': 'shiftPayNo' + $index() }"><span><strong>No</strong></span></label>
+                            </div>
+                        </div>
+
+                        <label class="label-header">What check type do you want to use when you collect timesheets?</label>
+                        <div class="form-group-indent">
+                            <div class="block-group">
+                                <div class="dropdown-container">
+                                    <label class="pull-left">Check Type:&nbsp;</label>
+                                    <select data-bind="
+                                        options: $parent.checkTypes,
+                                        optionsText: 'Name',
+                                        value: importTimeRequest.CheckCd,
+                                        optionsValue: 'Code',
+                                        valueAllowUnset: true,
+                                        visible: $parent.checkTypes"></select>
+                                    <span data-bind="visible: !$parent.checkTypes">No Data</span>
+
+                                </div>
+                            </div>
+                        </div>
+
+                        <label class="label-header">Do you want to add earnings so all employees reach minimum wage?</label>
+
+                        <div class="form-group-indent">
+                            <div class="squared-radio">
+                                <input data-bind="attr: {'id': 'minWageYes' + importTimeRequest.TempFileId,'name': 'minWage' + $index() },checked: importTimeRequest.MinWage,checkedValue:true" type="radio" />
+                                <label data-bind="attr: {'for': 'minWageYes' + importTimeRequest.TempFileId}"><span>Yes</span></label>
+                            </div>
+                            <div data-bind="attr: {'id': 'minWage' + importTimeRequest.TempFileId},visible:importTimeRequest.MinWage" class="form-group-indent">
+                                <div class="block-group">
+                                    <div class="dropdown-container">
+                                        <label class="pull-left">Straight Time Earnings Code:&nbsp;</label>
+                                        <select data-bind="
+                                            options: $parent.minimumWageCodes,
+                                            optionsText: 'Name',
+                                            value: importTimeRequest.MinWageEarningCd,
+                                            optionsValue: 'Code',
+                                            valueAllowUnset: true,
+                                            visible: $parent.minimumWageCodes"></select>
+                                        <span data-bind="visible: !($parents[0].minimumWageCodes)">No Data</span>
+                                    </div>
+                                </div>
+                                <div class="block-group">
+                                    <div class="dropdown-container">
+                                        <label class="pull-left">Overtime Earnings Code:&nbsp;</label>
+                                        <select data-bind="
+                                            options:$parent.overtimeCodes,
+                                            value: importTimeRequest.MinWageOvertimeCd,
+                                            optionsText: 'Name',
+                                            optionsValue: 'Code',
+                                            valueAllowUnset: true,
+                                            visible:$parent.overtimeCodes"></select>
+
+                                        <span data-bind="visible: !($parents[0].overtimeCodes)">No Data</span>
+                                    </div>
+                                </div>
+
+                            </div>
+                            <div class="squared-radio">
+                                <input data-bind="attr: {'id': 'minWageNo' + importTimeRequest.TempFileId,'name': 'minWage' + $index() },checked: importTimeRequest.MinWage,checkedValue:false" type="radio" />
+                                <label data-bind="attr: {'for': 'minWageNo' + importTimeRequest.TempFileId}"><span>No</span></label>
+                            </div>
+                        </div>
+
+
+                    </div>
+                    <div class="block-group success" data-bind="visible:(importComplete && importStatus === 'SUCCESS' && importWarnings===0 && importErrors === 0)">
+                        <span style="color: green">Import Successful</span>
+                    </div>
+
+                    <div class="block-group non-critical" data-bind="visible:(importWarnings > 0)">
+                        <label>Non Critical Warnings:&nbsp;</label><span data-bind="text: importWarnings"></span>
+
+                    </div>
+                    <div class="block-group critical" data-bind="visible:(importErrors > 0)">
+                        <label>Critical Warnings:&nbsp;</label><span data-bind="text: importErrors"></span>
+                    </div>
+                </li>
+            </ul>
+        </div>
+        <div class="option-control">
+            <span class="instructions">
+                (Files must be in text format, 1 MB max.)
+            </span>
+
+            <div class="upload-wrapper">
+                <input data-bind="fileupload:fileuploadOptions" type="file" name="files" multiple="" style="position: absolute;" value="Choose File"/>
+                <button class="primary light" data-bind="text: 'Choose File'" style=""></button>
+            </div>
+            <div class="drop-wrapper">
+                <div class="or-wrapper">
+                    <div class="left-line"></div>
+                    <span><strong>OR</strong></span>
+                    <div class="right-line"></div>
+                </div>
+                <div class="droppable-region">
+                    <span>Drag file(s) into this area</span>
+                </div>
+            </div>
+            <button class="primary light" data-bind="click: importTimeFiles,enable: (timesheets.length),css:{disabled:!timesheets.length}">Import Files(s)</button>
+            <button class="primary light" data-bind="click: confirmDeleteTimefiles,css:{disabled:!timesheets.length}">Delete Imported Timefiles</button>
+
+        </div>
+    </div>
+</div>
